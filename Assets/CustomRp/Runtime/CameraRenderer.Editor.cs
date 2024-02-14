@@ -1,11 +1,12 @@
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.Rendering;
 using UnityEngine.Profiling;
+using UnityEngine.Rendering;
 
-public partial class CameraRenderer
+partial class CameraRenderer : MonoBehaviour
 {
     partial void DrawGizmos();
+
     partial void DrawUnsupportedShaders();
 
     partial void PrepareForSceneWindow();
@@ -13,7 +14,6 @@ public partial class CameraRenderer
     partial void PrepareBuffer();
 
 #if UNITY_EDITOR
-    static Material errorMaterial;
     static ShaderTagId[] legacyShaderTagIds = {
         new ShaderTagId("Always"),
         new ShaderTagId("ForwardBase"),
@@ -23,23 +23,7 @@ public partial class CameraRenderer
         new ShaderTagId("VertexLM")
     };
 
-    string SampleName { get; set; }
-
-    partial void PrepareForSceneWindow()
-    {
-        if (camera.cameraType == CameraType.SceneView)
-        {
-            ScriptableRenderContext.EmitWorldGeometryForSceneView(camera);
-        }
-    }
-
-    partial void PrepareBuffer()
-    {
-        Profiler.BeginSample("Editor Only");
-        buffer.name = SampleName = camera.name;
-        Profiler.EndSample();
-    }
-
+    static Material errorMaterial;
 
     partial void DrawGizmos()
     {
@@ -54,32 +38,41 @@ public partial class CameraRenderer
     {
         if (errorMaterial == null)
         {
-            errorMaterial =
-                new Material(Shader.Find("Hidden/InternalErrorShader"));
+            errorMaterial = new Material(Shader.Find("Hidden/InternalErrorShader"));
         }
 
-        var drawingSettings = new DrawingSettings(
-            legacyShaderTagIds[0], new SortingSettings(camera)
-        )
+        var drawingSettings = new DrawingSettings(legacyShaderTagIds[0], new SortingSettings(camera))
         {
             overrideMaterial = errorMaterial
         };
+
+        var filteringSettings = FilteringSettings.defaultValue;
 
         for (int i = 1; i < legacyShaderTagIds.Length; i++)
         {
             drawingSettings.SetShaderPassName(i, legacyShaderTagIds[i]);
         }
-        var filteringSettings = FilteringSettings.defaultValue;
-        context.DrawRenderers(
-            cullingResults, ref drawingSettings, ref filteringSettings
-        );
+
+        context.DrawRenderers(cullingResults, ref drawingSettings, ref filteringSettings);
     }
 
+    partial void PrepareForSceneWindow()
+    {
+        if (camera.cameraType == CameraType.SceneView)
+        {
+            ScriptableRenderContext.EmitWorldGeometryForSceneView(camera);
+        }
+    }
 
+    string SampleName { get; set; }
+
+    partial void PrepareBuffer()
+    {
+        Profiler.BeginSample("Editor Only");
+        buffer.name = SampleName = camera.name;
+        Profiler.EndSample();
+    }
 #else
-
 	const string SampleName = bufferName;
-
 #endif
-
 }

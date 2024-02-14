@@ -13,12 +13,11 @@ public enum TextureSize
 [System.Serializable]
 public class ShadowSettings
 {
-    [Min(0f)]
+    [Min(0.001f)]
     public float maxDistance = 100f;
 
     [Range(0.001f, 1f)]
     public float distanceFade = 0.1f;
-
 
     public enum FilterMode
     {
@@ -52,17 +51,15 @@ public class ShadowSettings
         public CascadeBlendMode cascadeBlend;
     }
 
-    
-
     public Directional directional = new Directional
     {
         atlasSize = TextureSize._1024,
         filter = FilterMode.PCF2x2,
         cascadeCount = 4,
         cascadeRatio1 = 0.1f,
-        cascadeBlend = Directional.CascadeBlendMode.Hard,
         cascadeRatio2 = 0.25f,
         cascadeRatio3 = 0.5f,
-        cascadeFade = 0.1f
+        cascadeFade = 0.1f,
+        cascadeBlend = Directional.CascadeBlendMode.Hard
     };
 }

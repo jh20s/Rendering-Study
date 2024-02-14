@@ -17,13 +17,17 @@
 #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/UnityInstancing.hlsl"
 #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/SpaceTransforms.hlsl"
 
+UNITY_INSTANCING_BUFFER_START(UnityPerMaterial)
+    UNITY_DEFINE_INSTANCED_PROP(float4, _BaseMap_ST)
+    UNITY_DEFINE_INSTANCED_PROP(float4, _BaseColor)
+    UNITY_DEFINE_INSTANCED_PROP(float, _Cutoff)
+    UNITY_DEFINE_INSTANCED_PROP(float, _Metallic)
+    UNITY_DEFINE_INSTANCED_PROP(float, _Smoothness)
+UNITY_INSTANCING_BUFFER_END(UnityPerMaterial)
 
-float Square(float v) {
-	return v * v;
-}
-
-float DistanceSquared(float3 pA, float3 pB) {
-	return dot(pA - pB, pA - pB);
+float Square(float v)
+{
+    return v * v;
 }
 
 #endif

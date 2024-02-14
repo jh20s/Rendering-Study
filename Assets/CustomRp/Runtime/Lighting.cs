@@ -1,20 +1,23 @@
-﻿using Unity.Collections;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Rendering;
+using Unity.Collections;
 
 public class Lighting
 {
+
+    const string bufferName = "Lighting";
+
     const int maxDirLightCount = 4;
 
-    static int dirLightCountId = Shader.PropertyToID("_DirectionalLightCount"),
-               dirLightColorsId = Shader.PropertyToID("_DirectionalLightColors"),
-               dirLightDirectionsId = Shader.PropertyToID("_DirectionalLightDirections"),
-               dirLightShadowDataId = Shader.PropertyToID("_DirectionalLightShadowData");
+    private static int dirLightCountId = Shader.PropertyToID("_DirectionalLightCount");
+    private static int dirLightColorsId = Shader.PropertyToID("_DirectionalLightColors");
+    private static int dirLightDirectionsId = Shader.PropertyToID("_DirectionalLightDirections");
+    private static int dirLightShadowDataId = Shader.PropertyToID("_DirectionalLightShadowData");
 
-    static Vector4[] dirLightColors = new Vector4[maxDirLightCount],
-                     dirLightDirections = new Vector4[maxDirLightCount],
-                     dirLightShadowData = new Vector4[maxDirLightCount];
-    const string bufferName = "Lighting";
+    private static Vector4[] dirLightColors = new Vector4[maxDirLightCount];
+    private static Vector4[] dirLightDirections = new Vector4[maxDirLightCount];
+    private static Vector4[] dirLightShadowData = new Vector4[maxDirLightCount];
+
     CommandBuffer buffer = new CommandBuffer
     {
         name = bufferName
@@ -29,7 +32,6 @@ public class Lighting
         this.cullingResults = cullingResults;
         buffer.BeginSample(bufferName);
         shadows.Setup(context, cullingResults, shadowSettings);
-        //SetupDirectionalLight();
         SetupLights();
         shadows.Render();
         buffer.EndSample(bufferName);
@@ -37,7 +39,8 @@ public class Lighting
         buffer.Clear();
     }
 
-    void SetupLights() {
+    void SetupLights()
+    {
         NativeArray<VisibleLight> visibleLights = cullingResults.visibleLights;
         int dirLightCount = 0;
         for (int i = 0; i < visibleLights.Length; i++)
